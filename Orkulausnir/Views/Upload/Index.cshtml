@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Upload";
+}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Hlaða upp skjali</h2>
+        <h4>Nafn skjalsins skiptir mjög miklu máli þar sem það þarf að vera einkvæmt og nákvæmt</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        
+        <form asp-controller="Upload" asp-action="UploadFile" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <button type="submit">Upload File</button>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        @ViewBag.Message
+    </div>
+</div>

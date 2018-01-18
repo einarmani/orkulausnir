@@ -1,0 +1,188 @@
+﻿@using Orkulausnir.Models
+@model MeasurementViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Mæling 1</h2>
+    </div>
+    <div class="col-md-4">
+        <h2>Mæling 2</h2>
+    </div>
+    <div class="col-md-4">
+        <h2>Sía á birtingu</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        @*<h4>Gagnasett</h4>*@
+        @Html.DropDownListFor(model => Model.DatasetFilter1.FileName, Model.DataSets, new { id = "ddlFileName1" })
+    </div>
+    <div class="col-md-4">
+        @*<h4>Gagnasett til samanburðar</h4>*@
+        @Html.DropDownListFor(model => Model.DatasetFilter1.FileName, Model.DataSets, new { id = "ddlFileName2" })
+    </div>
+    <div class="col-md-4">
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <h4>Current/Voltage</h4>
+        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludeCurrent, new { id = "cbIncludeCurrent1" })
+        @Html.LabelFor(m => m.DatasetFilter1.IncludeCurrent)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludeVoltage, new { id = "cbIncludeVoltage1" })
+        @Html.LabelFor(m => m.DatasetFilter1.IncludeVoltage)
+    </div>
+    <div class="col-md-2">
+        <h4>Fasi</h4>
+        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludePhaseA, new { id = "cbIncludePhaseA1" })
+        @Html.LabelFor(m => m.DatasetFilter1.IncludePhaseA)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludePhaseB, new { id = "cbIncludePhaseB1" })
+        @Html.LabelFor(m => m.DatasetFilter1.IncludePhaseB)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludePhaseC, new { id = "cbIncludePhaseC1" })
+        @Html.LabelFor(m => m.DatasetFilter1.IncludePhaseC)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludeNeutral, new { id = "cbIncludeNeutral1" })
+        @Html.LabelFor(m => m.DatasetFilter1.IncludeNeutral)
+    </div>
+    <div class="col-md-2">
+        <h4>Current/Voltage</h4>
+        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludeCurrent, new { id = "cbIncludeCurrent2" })
+        @Html.LabelFor(m => m.DatasetFilter2.IncludeCurrent)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludeVoltage, new { id = "cbIncludeVoltage2" })
+        @Html.LabelFor(m => m.DatasetFilter2.IncludeVoltage)
+    </div>
+    <div class="col-md-2">
+        <h4>Fasi</h4>
+        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludePhaseA, new { id = "cbIncludePhaseA2" })
+        @Html.LabelFor(m => m.DatasetFilter2.IncludePhaseA)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludePhaseB, new { id = "cbIncludePhaseB2" })
+        @Html.LabelFor(m => m.DatasetFilter2.IncludePhaseB)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludePhaseC, new { id = "cbIncludePhaseC2" })
+        @Html.LabelFor(m => m.DatasetFilter2.IncludePhaseC)<br />
+        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludeNeutral, new { id = "cbIncludeNeutral2" })
+        @Html.LabelFor(m => m.DatasetFilter2.IncludeNeutral)
+    </div>
+    <div class="col-md-2">
+        <h4>Meðaltal/Hámark</h4>
+        @Html.RadioButtonFor(m => m.IncludeAverage, true, new { id = "rbIncludeAverage" })
+        @Html.LabelFor(m => m.IncludeAverage)<br />
+        @Html.RadioButtonFor(m => m.IncludeMax, true, new { id = "rbIncludeMax" })
+        @Html.LabelFor(m => m.IncludeMax)
+    </div>
+    <div class="col-md-2">
+        <h4>Harmonics</h4>
+        @Html.CheckBoxFor(m => m.IncludeHarmonics1_16, new { id = "cbIncludeHarmonics1_16" })
+        @Html.LabelFor(m => m.IncludeHarmonics1_16)<br />
+
+        @Html.CheckBoxFor(m => m.IncludeHarmonics17_31, new { id = "cbIncludeHarmonics17_31" })
+        @Html.LabelFor(m => m.IncludeHarmonics17_31)<br />
+
+        @Html.CheckBoxFor(m => m.IncludeHarmonics32_47, new { id = "cbIncludeHarmonics32_47" })
+        @Html.LabelFor(m => m.IncludeHarmonics32_47)<br />
+
+        @Html.CheckBoxFor(m => m.IncludeHarmonics48_63, new { id = "cbIncludeHarmonics48_63" })
+        @Html.LabelFor(m => m.IncludeHarmonics48_63)
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-10"></div>
+    <div class="col-md-2">
+        <input class="btn btn-primary" type="submit" id="filter" title="Bera saman" value="Bera saman"/>
+    </div>
+</div>
+
+<div class="row">
+    <div id="chartContainer"></div>
+</div>
+
+<script type="text/javascript">
+
+    $('#filter').click(function (event) {
+        event.preventDefault();
+
+        var dto = {
+            DatasetFilter1:
+            {
+                FileName: $('#ddlFileName1').val(),
+                IncludeCurrent: $("#cbIncludeCurrent1").prop('checked'),
+                IncludeVoltage: $("#cbIncludeVoltage1").prop('checked'),
+
+                IncludePhaseA: $("#cbIncludePhaseA1").prop('checked'),
+                IncludePhaseB: $("#cbIncludePhaseB1").prop('checked'),
+                IncludePhaseC: $("#cbIncludePhaseC1").prop('checked'),
+                IncludeNeutral: $("#cbIncludeNeutral1").prop('checked')
+            },
+            DatasetFilter2:
+            {
+                FileName: $('#ddlFileName2').val(),
+                IncludeCurrent: $("#cbIncludeCurrent2").prop('checked'),
+                IncludeVoltage: $("#cbIncludeVoltage2").prop('checked'),
+
+                IncludePhaseA: $("#cbIncludePhaseA2").prop('checked'),
+                IncludePhaseB: $("#cbIncludePhaseB2").prop('checked'),
+                IncludePhaseC: $("#cbIncludePhaseC2").prop('checked'),
+                IncludeNeutral: $("#cbIncludeNeutral2").prop('checked')
+            },
+
+            IncludeAverage: $("#rbIncludeAverage").prop('checked'),
+            IncludeMax: $("#rbIncludeMax").prop('checked'),
+
+            IncludeHarmonics1_16: $("#cbIncludeHarmonics1_16").prop('checked'),
+            IncludeHarmonics17_31: $("#cbIncludeHarmonics17_31").prop('checked'),
+            IncludeHarmonics32_47: $("#cbIncludeHarmonics32_47").prop('checked'),
+            IncludeHarmonics48_63: $("#cbIncludeHarmonics48_63").prop('checked')
+        };
+
+        console.log(dto);
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(dto),
+            url: '@Url.Action("Compare", "Home")',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                console.log(result);
+                populateGraph(result);
+            },
+            error: function (request, error) {
+                alert('Service call failed: ' + request.status + ' ' + request.statusText);
+            }
+        });
+    });
+
+    function populateGraph(data) {
+        var chart = new CanvasJS.Chart("chartContainer", {
+            theme: "theme2",
+            animationEnabled: true,
+            title: {
+                text: "Simple Column Chart in ASP.NET MVC"
+            },
+            subtitles: [
+                { text: "Try Resizing the Browser" }
+            ],
+            data: data
+            //[
+            //    {
+            //        type: "column", //change type to bar, line, area, pie, etc
+            //        dataPoints: data
+            //        //[
+            //        //    { x: 10, y: 71 },
+            //        //    { x: 20, y: 55 },
+            //        //    { x: 30, y: 50 },
+            //        //    { x: 40, y: 65 },
+            //        //    { x: 50, y: 95 },
+            //        //    { x: 60, y: 68 },
+            //        //    { x: 70, y: 28 },
+            //        //    { x: 80, y: 34 },
+            //        //    { x: 90, y: 14 }
+            //        //]
+            //    }
+            //]
+        });
+        chart.render();
+    };
+</script>
