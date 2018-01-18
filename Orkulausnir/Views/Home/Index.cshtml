@@ -7,70 +7,51 @@
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Mæling 1</h2>
+        <h2>Mæling</h2>
     </div>
     <div class="col-md-4">
-        <h2>Mæling 2</h2>
+        <h2>Samanburðarmæling</h2>
     </div>
     <div class="col-md-4">
-        <h2>Sía á birtingu</h2>
+        <h5>Ef enginn samanburðarmæling er valin er hver stöpull í grafinu fasi.</h5><h5>Ef samanburðarmæling er valin birtast tveir stöplar fyrir hvora mælingu þar sem gildin er samanlagðir fasar</h5>
     </div>
 </div>
 <div class="row">
     <div class="col-md-4">
-        @*<h4>Gagnasett</h4>*@
-        @Html.DropDownListFor(model => Model.DatasetFilter1.FileName, Model.DataSets, new { id = "ddlFileName1" })
+        @Html.DropDownListFor(model => Model.FileName1, Model.DataSets, new { id = "ddlFileName1" })
     </div>
     <div class="col-md-4">
-        @*<h4>Gagnasett til samanburðar</h4>*@
-        @Html.DropDownListFor(model => Model.DatasetFilter1.FileName, Model.DataSets, new { id = "ddlFileName2" })
+        @Html.DropDownListFor(model => Model.FileName2, Model.DataSets, "Veldu mælingu", new { id = "ddlFileName2" })
     </div>
     <div class="col-md-4">
     </div>
 </div>
+<br />
 <div class="row">
     <div class="col-md-2">
         <h4>Current/Voltage</h4>
-        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludeCurrent, new { id = "cbIncludeCurrent1" })
-        @Html.LabelFor(m => m.DatasetFilter1.IncludeCurrent)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludeVoltage, new { id = "cbIncludeVoltage1" })
-        @Html.LabelFor(m => m.DatasetFilter1.IncludeVoltage)
+        @Html.RadioButton("useCurrent", Model.UseCurrent, true, new { id = "rbUseCurrent" })
+        <label>Current</label><br />
+        @Html.RadioButton("useVoltage", !Model.UseCurrent, new { id = "rbUseVoltage" })
+        <label>Voltage</label>
     </div>
     <div class="col-md-2">
         <h4>Fasi</h4>
-        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludePhaseA, new { id = "cbIncludePhaseA1" })
-        @Html.LabelFor(m => m.DatasetFilter1.IncludePhaseA)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludePhaseB, new { id = "cbIncludePhaseB1" })
-        @Html.LabelFor(m => m.DatasetFilter1.IncludePhaseB)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludePhaseC, new { id = "cbIncludePhaseC1" })
-        @Html.LabelFor(m => m.DatasetFilter1.IncludePhaseC)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter1.IncludeNeutral, new { id = "cbIncludeNeutral1" })
-        @Html.LabelFor(m => m.DatasetFilter1.IncludeNeutral)
-    </div>
-    <div class="col-md-2">
-        <h4>Current/Voltage</h4>
-        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludeCurrent, new { id = "cbIncludeCurrent2" })
-        @Html.LabelFor(m => m.DatasetFilter2.IncludeCurrent)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludeVoltage, new { id = "cbIncludeVoltage2" })
-        @Html.LabelFor(m => m.DatasetFilter2.IncludeVoltage)
-    </div>
-    <div class="col-md-2">
-        <h4>Fasi</h4>
-        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludePhaseA, new { id = "cbIncludePhaseA2" })
-        @Html.LabelFor(m => m.DatasetFilter2.IncludePhaseA)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludePhaseB, new { id = "cbIncludePhaseB2" })
-        @Html.LabelFor(m => m.DatasetFilter2.IncludePhaseB)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludePhaseC, new { id = "cbIncludePhaseC2" })
-        @Html.LabelFor(m => m.DatasetFilter2.IncludePhaseC)<br />
-        @Html.CheckBoxFor(m => m.DatasetFilter2.IncludeNeutral, new { id = "cbIncludeNeutral2" })
-        @Html.LabelFor(m => m.DatasetFilter2.IncludeNeutral)
+        @Html.CheckBoxFor(m => m.IncludePhaseA, new { id = "cbIncludePhaseA" })
+        @Html.LabelFor(m => m.IncludePhaseA)<br />
+        @Html.CheckBoxFor(m => m.IncludePhaseB, new { id = "cbIncludePhaseB" })
+        @Html.LabelFor(m => m.IncludePhaseB)<br />
+        @Html.CheckBoxFor(m => m.IncludePhaseC, new { id = "cbIncludePhaseC" })
+        @Html.LabelFor(m => m.IncludePhaseC)<br />
+        @Html.CheckBoxFor(m => m.IncludePhaseNeutral, new { id = "cbIncludePhaseNeutral" })
+        @Html.LabelFor(m => m.IncludePhaseNeutral)
     </div>
     <div class="col-md-2">
         <h4>Meðaltal/Hámark</h4>
-        @Html.RadioButtonFor(m => m.IncludeAverage, true, new { id = "rbIncludeAverage" })
-        @Html.LabelFor(m => m.IncludeAverage)<br />
-        @Html.RadioButtonFor(m => m.IncludeMax, true, new { id = "rbIncludeMax" })
-        @Html.LabelFor(m => m.IncludeMax)
+        @Html.RadioButton("useAverage", Model.UseAverage, true, new { id = "rbUseAverage" })
+        <label>Meðaltal</label><br />
+        @Html.RadioButton("useMax", !Model.UseAverage, new { id = "rbUseMax" })
+        <label>Hámark</label>
     </div>
     <div class="col-md-2">
         <h4>Harmonics</h4>
@@ -105,36 +86,21 @@
         event.preventDefault();
 
         var dto = {
-            DatasetFilter1:
-            {
-                FileName: $('#ddlFileName1').val(),
-                IncludeCurrent: $("#cbIncludeCurrent1").prop('checked'),
-                IncludeVoltage: $("#cbIncludeVoltage1").prop('checked'),
-
-                IncludePhaseA: $("#cbIncludePhaseA1").prop('checked'),
-                IncludePhaseB: $("#cbIncludePhaseB1").prop('checked'),
-                IncludePhaseC: $("#cbIncludePhaseC1").prop('checked'),
-                IncludeNeutral: $("#cbIncludeNeutral1").prop('checked')
-            },
-            DatasetFilter2:
-            {
-                FileName: $('#ddlFileName2').val(),
-                IncludeCurrent: $("#cbIncludeCurrent2").prop('checked'),
-                IncludeVoltage: $("#cbIncludeVoltage2").prop('checked'),
-
-                IncludePhaseA: $("#cbIncludePhaseA2").prop('checked'),
-                IncludePhaseB: $("#cbIncludePhaseB2").prop('checked'),
-                IncludePhaseC: $("#cbIncludePhaseC2").prop('checked'),
-                IncludeNeutral: $("#cbIncludeNeutral2").prop('checked')
-            },
-
-            IncludeAverage: $("#rbIncludeAverage").prop('checked'),
-            IncludeMax: $("#rbIncludeMax").prop('checked'),
-
+            FileName1: $('#ddlFileName1').val(),
+            FileName2: $('#ddlFileName2').val(),
+            UseCurrent: $("#rbUseCurrent").prop('checked'),
+            
+            UseAverage: $("#rbUseAverage").prop('checked'),
+            
             IncludeHarmonics1_16: $("#cbIncludeHarmonics1_16").prop('checked'),
             IncludeHarmonics17_31: $("#cbIncludeHarmonics17_31").prop('checked'),
             IncludeHarmonics32_47: $("#cbIncludeHarmonics32_47").prop('checked'),
-            IncludeHarmonics48_63: $("#cbIncludeHarmonics48_63").prop('checked')
+            IncludeHarmonics48_63: $("#cbIncludeHarmonics48_63").prop('checked'),
+
+            IncludePhaseA: $("#cbIncludePhaseA").prop('checked'),
+            IncludePhaseB: $("#cbIncludePhaseB").prop('checked'),
+            IncludePhaseC: $("#cbIncludePhaseC").prop('checked'),
+            IncludePhaseNeutral: $("#cbIncludePhaseNeutral").prop('checked')
         };
 
         console.log(dto);
@@ -159,10 +125,10 @@
             theme: "theme2",
             animationEnabled: true,
             title: {
-                text: "Simple Column Chart in ASP.NET MVC"
+                text: "Samanburður mælinga"
             },
             subtitles: [
-                { text: "Try Resizing the Browser" }
+                { text: "Prófaðu að stækka browser'inn" }
             ],
             data: data
             //[
@@ -185,4 +151,20 @@
         });
         chart.render();
     };
+
+    $('#rbUseAverage').click(function() {
+        $('#rbUseMax').attr('checked', false);
+    });
+
+    $('#rbUseMax').click(function () {
+        $('#rbUseAverage').attr('checked', false);
+    });
+
+    $('#rbUseCurrent').click(function () {
+        $('#rbUseVoltage').attr('checked', false);
+    });
+
+    $('#rbUseVoltage').click(function () {
+        $('#rbUseCurrent').attr('checked', false);
+    });
 </script>

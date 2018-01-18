@@ -9,10 +9,11 @@ using Orkulausnir.Models;
 
 namespace Orkulausnir.Controllers
 {
-    // todo:
-    // cache file names and files when they are fetched
+    // todo: cache file names and files when they are fetched
     public class HomeController : Controller
     {
+        private const string GraphType = "column";
+
         public IActionResult Index()
         {
             var files = AzureDataAccess.GetFileNames();
@@ -28,7 +29,8 @@ namespace Orkulausnir.Controllers
             }
             
             model.DataSets = fileList;
-            model.IncludeAverage = true;
+            //model.UseCurrent = true;
+            //model.UseAverage = true;
             model.IncludeHarmonics1_16 = true;
             
             return View(model);
@@ -37,40 +39,65 @@ namespace Orkulausnir.Controllers
         [HttpPost]
         public IActionResult Compare([FromBody] MeasurementViewModel model)
         {
-            byte[] file1 = AzureDataAccess.GetFile(model.DatasetFilter1.FileName).Result;
-            if (file1.Length == 0)
-            {
-                throw new ArgumentException($"Skjalið {model.DatasetFilter1.FileName} fannst ekki");
-            }
-
-            // we are comparing the same file
-            byte[] file2 = model.DatasetFilter1.FileName == model.DatasetFilter2.FileName ? file1 : AzureDataAccess.GetFile(model.DatasetFilter2.FileName).Result;
-            if (file2.Length == 0)
-            {
-                throw new ArgumentException($"Skjalið {model.DatasetFilter1.FileName} fannst ekki");
-            }
-
-            var measurement1 = DomainLogic.DomainLogic.FilterData(file1, model.DatasetFilter1);
-            var measurement2 = DomainLogic.DomainLogic.FilterData(file2, model.DatasetFilter2);
-
+            bool isSameMeasurementComparison = string.IsNullOrEmpty(model.FileName2);
             List<int> harmonics = DomainLogic.DomainLogic.GetHarmonics(model.IncludeHarmonics1_16, model.IncludeHarmonics17_31, model.IncludeHarmonics32_47, model.IncludeHarmonics48_63);
-            
-            List<DataPoint> dataPoints1 = DomainLogic.DomainLogic.GetDataPoints(harmonics, model.IncludeAverage, measurement1);
-            List<DataPoint> dataPoints2 = DomainLogic.DomainLogic.GetDataPoints(harmonics, model.IncludeAverage, measurement2);
+            var phaseEnums = new List<PhaseEnum>();
+            if (model.IncludePhaseA) phaseEnums.Add(PhaseEnum.A);
+            if (model.IncludePhaseB) phaseEnums.Add(PhaseEnum.B);
+            if (model.IncludePhaseC) phaseEnums.Add(PhaseEnum.C);
+            if (model.IncludePhaseNeutral) phaseEnums.Add(PhaseEnum.Neutral);
             
             var graphData = new List<GraphData>();
-            graphData.Add(new GraphData
-            {
-                Type = "column",
-                DataPoints = dataPoints1
-            });
 
-            graphData.Add(new GraphData
+            byte[] file1 = AzureDataAccess.GetFile(model.FileName1).Result;
+            if (file1.Length == 0)
             {
-                Type = "column",
-                DataPoints = dataPoints2
-            });
+                throw new ArgumentException($"Skjalið {model.FileName1} fannst ekki");
+            }
+            
+            if (isSameMeasurementComparison)
+            {
+                // we are comparing the same file so each phase is a datapoint
+                foreach (var phase in phaseEnums)
+                {
+                    var measurement1 = DomainLogic.DomainLogic.FilterData(file1, model.UseCurrent, new List<PhaseEnum> {phase});
+                    List<DataPoint> dataPoints = DomainLogic.DomainLogic.GetDataPoints(harmonics, model.UseAverage, measurement1);
+                    graphData.Add(new GraphData
+                    {
+                        DataPoints = dataPoints,
+                        Type = GraphType,
+                        Label = "ble-" + Guid.NewGuid().ToString().Substring(0,4)
+                    });
+                }
+            }
+            else
+            {
+                // we are comparing two different measurements so the sum of XXxx xxxx TBD!!!!
+                byte[] file2 = model.FileName1 == model.FileName2 ? file1 : AzureDataAccess.GetFile(model.FileName2).Result;
+                if (file2.Length == 0)
+                {
+                    throw new ArgumentException($"Skjalið {model.FileName2} fannst ekki");
+                }
 
+                var measurement1 = DomainLogic.DomainLogic.FilterData(file1, model.UseCurrent, phaseEnums);
+                List<DataPoint> dataPoints = DomainLogic.DomainLogic.GetDataPoints(harmonics, model.UseAverage, measurement1);
+                graphData.Add(new GraphData
+                {
+                    DataPoints = dataPoints,
+                    Type = GraphType,
+                    Label = "ble-" + Guid.NewGuid().ToString().Substring(0, 4)
+                });
+
+                var measurement2 = DomainLogic.DomainLogic.FilterData(file2, model.UseCurrent, phaseEnums);
+                List<DataPoint> dataPoints2 = DomainLogic.DomainLogic.GetDataPoints(harmonics, model.UseAverage, measurement2);
+                graphData.Add(new GraphData
+                {
+                    DataPoints = dataPoints2,
+                    Type = GraphType,
+                    Label = "some label"
+                });
+            }
+            
             return Json(graphData);
         }
 

@@ -61,8 +61,8 @@ namespace Orkulausnir.DomainLogic
                     dataItems[listIndex].Measurements.Add(new MeasurementItem
                     {
                         Harmonic = Convert.ToInt32(measurementLine[0]),
-                        Average = Convert.ToDecimal(measurementLine[1].Replace('.', ',')),
-                        Max = Convert.ToDecimal(measurementLine[2].Replace('.', ','))
+                        Average = Convert.ToDouble(measurementLine[1].Replace('.', ',')),
+                        Max = Convert.ToDouble(measurementLine[2].Replace('.', ','))
                     });
                 }
             }
@@ -78,17 +78,20 @@ namespace Orkulausnir.DomainLogic
             return dataItems;
         }
 
-        public static IList<MeasurementParent> FilterData(byte[] file, DatasetFilter filter)
+        public static IList<MeasurementParent> FilterData(byte[] file, bool useCurrent, List<PhaseEnum> phase)
         {
             IList<MeasurementParent> measurementParent1 = ParseFile(file);
             
             List<MeasurementParent> filteredData = measurementParent1.Where(x =>
-                ((filter.IncludeCurrent && x.Quantities == ElectricalQuantities.Current) ||
-                 (filter.IncludeVoltage && x.Quantities == ElectricalQuantities.Voltage)) &&
-                ((filter.IncludePhaseA && x.Phase == PhaseEnum.A) ||
-                 (filter.IncludePhaseB && x.Phase == PhaseEnum.B) ||
-                 (filter.IncludePhaseC && x.Phase == PhaseEnum.C) ||
-                 (filter.IncludeNeutral && x.Phase == PhaseEnum.Neutral))
+                ((useCurrent && x.Quantities == ElectricalQuantities.Current) ||
+                 (!useCurrent && x.Quantities == ElectricalQuantities.Voltage)) &&
+                (
+                phase.Contains(x.Phase)
+                //(filter.IncludePhaseA && x.Phase == PhaseEnum.A) ||
+                // (filter.IncludePhaseB && x.Phase == PhaseEnum.B) ||
+                // (filter.IncludePhaseC && x.Phase == PhaseEnum.C) ||
+                // (filter.IncludePhaseNeutral && x.Phase == PhaseEnum.Neutral)
+                 )
             ).ToList();
 
             return filteredData;
@@ -129,21 +132,21 @@ namespace Orkulausnir.DomainLogic
             return harmonics;
         }
 
-        public static List<DataPoint> GetDataPoints(List<int> harmonics, bool includeAverage, IList<MeasurementParent> measurements)
+        public static List<DataPoint> GetDataPoints(List<int> harmonics, bool useAverage, IList<MeasurementParent> measurements)
         {
             List<DataPoint> dataPoints = new List<DataPoint>();
             foreach (var h in harmonics)
             {
                 var harmonicMeasures = measurements.SelectMany(x => x.Measurements).Where(x => x.Harmonic == h).ToList();
-                if (includeAverage)
+                if (useAverage)
                 {
-                    decimal value = harmonicMeasures.Sum(x => x.Average);
-                    dataPoints.Add(new DataPoint(h, (double)value));
+                    var value = harmonicMeasures.Sum(x => x.Average);
+                    dataPoints.Add(new DataPoint(h, value));
                 }
                 else
                 {
-                    decimal value = harmonicMeasures.Sum(x => x.Max);
-                    dataPoints.Add(new DataPoint(h, (double)value));
+                    var value = harmonicMeasures.Sum(x => x.Max);
+                    dataPoints.Add(new DataPoint(h, value));
                 }
             }
 

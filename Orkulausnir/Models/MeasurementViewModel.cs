@@ -6,12 +6,26 @@ namespace Orkulausnir.Models
 {
     public class MeasurementViewModel
     {
-        [Display(Name = "Meðaltal")]
-        public bool IncludeAverage { get; set; }
+        public string FileName1 { get; set; }
 
-        [Display(Name = "Hámark")]
-        public bool IncludeMax { get; set; }
+        public string FileName2 { get; set; }
+
+        public bool UseCurrent { get; set; }
         
+        public bool UseAverage { get; set; }
+        
+        [Display(Name = "Fasi A")]
+        public bool IncludePhaseA { get; set; }
+
+        [Display(Name = "Fasi B")]
+        public bool IncludePhaseB { get; set; }
+
+        [Display(Name = "Fasi C")]
+        public bool IncludePhaseC { get; set; }
+
+        [Display(Name = "Neutral")]
+        public bool IncludePhaseNeutral { get; set; }
+
         [Display(Name = "1-16")]
         public bool IncludeHarmonics1_16 { get; set; }
 
@@ -25,9 +39,7 @@ namespace Orkulausnir.Models
         public bool IncludeHarmonics48_63 { get; set; }
         
         public IEnumerable<SelectListItem> DataSets { get; set; }
-
-        public DatasetFilter DatasetFilter1 { get; set; }
-
-        public DatasetFilter DatasetFilter2 { get; set; }
+        
+        public List<string> Filters { get; set; }
     }
 }
